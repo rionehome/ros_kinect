@@ -7,10 +7,15 @@
 #include "KinectAPI.hpp"
 #include <std_msgs/Float64MultiArray.h>
 
-cv::Mat getDepthDrawableImage(cv::Mat depth_map) {
+cv::Mat getDepthDrawableImage(std::vector<double> depth_vector) {
+	cv::Mat raw_input = cv::Mat::zeros(480, 640, CV_64F);
 	cv::Mat drawable;
-	depth_map.convertTo(drawable, CV_8UC3, 255 / 4000.0);
-	cv::cvtColor(drawable, drawable, cv::COLOR_GRAY2BGR);
+	for (int x = 0; x < 640; ++x) {
+		for (int y = 0; y < 480; ++y) {
+			raw_input.at<double>(y, x) = depth_vector[640 * y + x] * 255 / 4000.0;
+		}
+	}
+	raw_input.convertTo(drawable, CV_8UC1);
 	return drawable;
 }
 
@@ -33,13 +38,13 @@ int main(int argc, char** argv) {
 
 	while (ros::ok()) {
 		KinectAPI.update(&max_index, input_points);
-		if (!KinectAPI.getColorImage().empty() && !KinectAPI.getDepthImage().empty() && !KinectAPI.getUserTracker().empty()) {
-			cv::imshow("color", KinectAPI.getColorImage());
-			//cv::imshow("depth", KinectAPI.getDepthDrawableImage(KinectAPI.getDepthImage()));
+		if (!KinectAPI.getColorImage().empty() && !KinectAPI.getDepthVector().empty() && !KinectAPI.getUserTracker().empty()) {
+			//cv::imshow("color", KinectAPI.getColorImage());
+			cv::imshow("depth", getDepthDrawableImage(KinectAPI.getDepthVector()));
 			//cv::imshow("user", KinectAPI.getUserTracker());
 
-			//cv::Mat result = KinectAPI.getUserTracker() + getDepthDrawableImage(KinectAPI.getDepthImage());
-			//cv::Mat result = KinectAPI.getSkeletonImage() + getDepthDrawableImage(KinectAPI.getDepthImage());
+			//cv::Mat result = KinectAPI.getUserTracker() + getDepthDrawableImage(KinectAPI.getDepthVector());
+			//cv::Mat result = KinectAPI.getSkeletonImage() + getDepthDrawableImage(KinectAPI.getDepthVector());
 			user_points.data.clear();
 			for (int i = 0; i < max_index; ++i) {
 				//printf("%f %f\n", input_points[i].x, input_points[i].y );
@@ -53,7 +58,7 @@ int main(int argc, char** argv) {
 
 			//sensor_msgs::ImagePtr msg = cv_bridge::CvImage(std_msgs::Header(), "bgr8", image).toImageMsg();
 			color.publish(cv_bridge::CvImage(std_msgs::Header(), "rgb8", KinectAPI.getColorImage()).toImageMsg());
-			depth.publish(cv_bridge::CvImage(std_msgs::Header(), "mono16", KinectAPI.getDepthImage()).toImageMsg());
+			//depth.publish(cv_bridge::CvImage(std_msgs::Header(), "mono64", KinectAPI.getDepthVector()).toImageMsg());
 			//cv::imshow("user2", result );
 			cv::waitKey(1);
 		}

@@ -13,7 +13,7 @@ using namespace std;
 int Colors[][3] = {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}, {1, 1, 0}, {1, 0, 1}, {0, 1, 1}, {1, 1, 1}};
 
 cv::Mat color;
-cv::Mat depth_map;
+std::vector<double> depth_map;
 cv::Mat user;
 cv::Mat skeleton;
 
@@ -25,7 +25,7 @@ public:
 	void update(int *max_index, cv::Point3d points[]);
 	cv::Mat getUserTracker() {return user;}
 	cv::Mat getColorImage() {return color;}
-	cv::Mat getDepthImage() {return depth_map;}
+	std::vector<double> getDepthVector() {return depth_map;}
 	cv::Mat getSkeletonImage() {return skeleton;}
 
 private:
@@ -60,20 +60,19 @@ cv::Mat getColorImage_src(openni::VideoFrameRef& color_frame) {
 	return ret_img;
 }
 
-cv::Mat getDepthMap_src(openni::VideoFrameRef& depth_frame) {
+std::vector<double> getDepthMap_src(openni::VideoFrameRef& depth_frame) {
+	std::vector<double> depth_vector;
 	if (!depth_frame.isValid()) {
-		return cv::Mat();
+		return depth_vector;
 	}
-	cv::Mat map(depth_frame.getVideoMode().getResolutionY(), depth_frame.getVideoMode().getResolutionX(), CV_MAKETYPE(CV_64F, 1));
-
 	const openni::DepthPixel* depth_raw = (const openni::DepthPixel*)depth_frame.getData();
 
 	for (int y = 0; y < depth_frame.getVideoMode().getResolutionY(); ++y) {
 		for (int x = 0; x < depth_frame.getVideoMode().getResolutionX(); ++x, ++depth_raw) {
-			map.at<double>(y, x) = *depth_raw;
+			depth_vector.push_back(*depth_raw);
 		}
 	}
-	return map;
+	return depth_vector;
 }
 
 cv::Mat getUserTracker_src(openni::VideoFrameRef& depth_frame, const nite::UserMap& userLabels, int *max_index, cv::Point3d points[]) {
@@ -102,7 +101,7 @@ cv::Mat getUserTracker_src(openni::VideoFrameRef& depth_frame, const nite::UserM
 				//重心計算
 				points[*pLabels - 1].x += x;
 				points[*pLabels - 1].y += y;
-				points[*pLabels - 1].z += depth_map.at<double>(y, x);
+				points[*pLabels - 1].z += depth_map[depth_frame.getVideoMode().getResolutionX() * y + x];
 				count[*pLabels - 1]++;
 				if (*max_index < *pLabels) *max_index = *pLabels;
 			}

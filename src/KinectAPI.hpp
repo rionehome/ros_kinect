@@ -56,7 +56,7 @@ cv::Mat getColorImage_src(openni::VideoFrameRef& color_frame) {
 	                            video_mode.getResolutionX(),
 	                            CV_8UC3, (char*)color_frame.getData());
 	cv::Mat ret_img;
-	cv::cvtColor(color_img, ret_img, CV_RGB2BGR);
+	cv::cvtColor(color_img, ret_img, CV_BGRA2RGB);
 	return ret_img;
 }
 

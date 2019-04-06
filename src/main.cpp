@@ -34,12 +34,12 @@ int main(int argc, char** argv) {
 	while (ros::ok()) {
 		KinectAPI.update(&max_index, input_points);
 		if (!KinectAPI.getColorImage().empty() && !KinectAPI.getDepthImage().empty() && !KinectAPI.getUserTracker().empty()) {
-			//cv::imshow("color", KinectAPI.getColorImage());
+			cv::imshow("color", KinectAPI.getColorImage());
 			//cv::imshow("depth", KinectAPI.getDepthDrawableImage(KinectAPI.getDepthImage()));
-			cv::imshow("user", KinectAPI.getUserTracker());
+			//cv::imshow("user", KinectAPI.getUserTracker());
 
-			//cv::Mat result = KinectAPI.getUserTracker() + KinectAPI.getDepthDrawableImage(KinectAPI.getDepthImage());
-			cv::Mat result = KinectAPI.getSkeletonImage() + getDepthDrawableImage(KinectAPI.getDepthImage());
+			//cv::Mat result = KinectAPI.getUserTracker() + getDepthDrawableImage(KinectAPI.getDepthImage());
+			//cv::Mat result = KinectAPI.getSkeletonImage() + getDepthDrawableImage(KinectAPI.getDepthImage());
 			user_points.data.clear();
 			for (int i = 0; i < max_index; ++i) {
 				//printf("%f %f\n", input_points[i].x, input_points[i].y );

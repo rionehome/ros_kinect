@@ -44,3 +44,5 @@ set(myapp_sources src/main.cpp src/HumanTracker.hpp)
 add_executable(ros_kinect ${myapp_sources})
 
 target_link_libraries(ros_kinect  ${catkin_LIBRARIES} ${OpenCV_LIBS} OpenNI2 NiTE2 glut GL)
+#add_executable(openni_kinect_sample src/openni_kinect_sample.cpp)
+#target_link_libraries(openni_kinect_sample  ${catkin_LIBRARIES})

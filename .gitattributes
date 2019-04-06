@@ -1,0 +1,2 @@
+NiTE2 filter=lfs diff=lfs merge=lfs -text
+OpenNI2 filter=lfs diff=lfs merge=lfs -text

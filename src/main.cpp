@@ -32,7 +32,7 @@ int main(int argc, char** argv) {
 	int max_index = 0;
 	cv::Point3d input_points[16];
 	std_msgs::Float64MultiArray user_points;
-	ros::Publisher pub = n.advertise<std_msgs::Float64MultiArray>("/ros_kinect/points", 1000);
+	ros::Publisher pub_points = n.advertise<std_msgs::Float64MultiArray>("/ros_kinect/points", 1000);
 	ros::Publisher pub_color = n.advertise<sensor_msgs::Image>("/ros_kinect/color", 1000);
 	ros::Publisher pub_depth = n.advertise<std_msgs::Float64MultiArray_<double>>("/ros_kinect/depth", 1000);
 	std_msgs::Float64MultiArray depth_array;
@@ -42,7 +42,7 @@ int main(int argc, char** argv) {
 			//cv::imshow("color", KinectAPI.getColorImage());
 			cv::imshow("depth", getDepthDrawableImage(KinectAPI.getDepthVector()));
 			//cv::imshow("user", KinectAPI.getUserTracker());
-
+			//cv::Mat result = KinectAPI.getColorImage() + getDepthDrawableImage(KinectAPI.getDepthVector());
 			//cv::Mat result = KinectAPI.getUserTracker() + getDepthDrawableImage(KinectAPI.getDepthVector());
 			//cv::Mat result = KinectAPI.getSkeletonImage() + getDepthDrawableImage(KinectAPI.getDepthVector());
 			user_points.data.clear();
@@ -54,10 +54,9 @@ int main(int argc, char** argv) {
 				user_points.data.push_back(input_points[i].y);
 				user_points.data.push_back(input_points[i].z);
 			}
-			pub.publish(user_points);
+			pub_points.publish(user_points);
 
 			depth_array.data.clear();
-
 			for (double depth : KinectAPI.getDepthVector()) depth_array.data.push_back(depth);
 
 			//sensor_msgs::ImagePtr msg = cv_bridge::CvImage(std_msgs::Header(), "bgr8", image).toImageMsg();
@@ -65,7 +64,7 @@ int main(int argc, char** argv) {
 			pub_depth.publish(depth_array);
 			//depth.publish(cv_bridge::CvImage(std_msgs::Header(), "mono64", KinectAPI.getDepthVector()).toImageMsg());
 			//cv::imshow("user2", result );
-			//cv::waitKey(1);
+			cv::waitKey(1);
 		}
 		ros::spinOnce();
 	}

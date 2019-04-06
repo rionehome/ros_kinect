@@ -13,7 +13,7 @@ using namespace std;
 int Colors[][3] = {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}, {1, 1, 0}, {1, 0, 1}, {0, 1, 1}, {1, 1, 1}};
 
 cv::Mat color;
-std::vector<double> depth_map;
+std::vector<double> depth_vector;
 cv::Mat user;
 cv::Mat skeleton;
 
@@ -25,7 +25,7 @@ public:
 	void update(int *max_index, cv::Point3d points[]);
 	cv::Mat getUserTracker() {return user;}
 	cv::Mat getColorImage() {return color;}
-	std::vector<double> getDepthVector() {return depth_map;}
+	std::vector<double> getDepthVector() {return depth_vector;}
 	cv::Mat getSkeletonImage() {return skeleton;}
 
 private:
@@ -55,9 +55,7 @@ cv::Mat getColorImage_src(openni::VideoFrameRef& color_frame) {
 	cv::Mat color_img = cv::Mat(video_mode.getResolutionY(),
 	                            video_mode.getResolutionX(),
 	                            CV_8UC3, (char*)color_frame.getData());
-	cv::Mat ret_img;
-	cv::cvtColor(color_img, ret_img, CV_BGRA2RGB);
-	return ret_img;
+	return color_img;
 }
 
 std::vector<double> getDepthMap_src(openni::VideoFrameRef& depth_frame) {
@@ -101,14 +99,14 @@ cv::Mat getUserTracker_src(openni::VideoFrameRef& depth_frame, const nite::UserM
 				//重心計算
 				points[*pLabels - 1].x += x;
 				points[*pLabels - 1].y += y;
-				points[*pLabels - 1].z += depth_map[depth_frame.getVideoMode().getResolutionX() * y + x];
+				points[*pLabels - 1].z += depth_vector[depth_frame.getVideoMode().getResolutionX() * y + x];
 				count[*pLabels - 1]++;
 				if (*max_index < *pLabels) *max_index = *pLabels;
 			}
 		}
 	}
 
-	if (!depth_map.empty()) {
+	if (!depth_vector.empty()) {
 		for (int i = 0; i < *max_index; ++i) {
 			if (count[i] != 0) {
 				points[i].x = points[i].x / count[i];
@@ -275,7 +273,7 @@ void KinectAPI::update(int *max_index, cv::Point3d points[]) {
 	}
 
 	if (depth_frame.isValid()) {
-		depth_map = getDepthMap_src(depth_frame);
+		depth_vector = getDepthMap_src(depth_frame);
 		user = getUserTracker_src(depth_frame, userLabels, max_index, points);
 		skeleton = getUserSkeleton_src(depth_frame, users, m_pUserTracker, max_index, points);
 	}

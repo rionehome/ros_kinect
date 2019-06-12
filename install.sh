@@ -5,6 +5,9 @@ cd
 #install libfreenect
 git clone https://github.com/OpenKinect/libfreenect.git
 cd libfreenect
+
+sed -i '1iadd_compile_options(-std=c++11)' CMakeLists.txt
+
 mkdir build; cd build
 cmake .. -DBUILD_OPENNI2_DRIVER=ON
 make

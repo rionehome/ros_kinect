@@ -30,14 +30,14 @@ set( OpenCV_DIR "/usr/local/include/opencv2/" )
 find_package( OpenCV REQUIRED )
 
 set(CMAKE_MACOSX_RPATH 1)
-set(INSTALL_RPATH "/home/migly/catkin_ws/src/ros_kinect")
+set(INSTALL_RPATH "~/catkin_ws/src/ros_kinect")
 
-include_directories(/home/migly/OpenNI-Linux-x64-2.2/Include)
-include_directories(/home/migly/NiTE-Linux-x64-2.2/Include)
+include_directories(~/OpenNI-Linux-x64-2.2/Include)
+include_directories(~/NiTE-Linux-x64-2.2/Include)
 
 
-link_directories(/home/migly/OpenNI-Linux-x64-2.2/Redist)
-link_directories(/home/migly/NiTE-Linux-x64-2.2/Redist)
+link_directories(~/OpenNI-Linux-x64-2.2/Redist)
+link_directories(~/NiTE-Linux-x64-2.2/Redist)
 
 
 set(myapp_sources src/main.cpp src/HumanTracker.hpp)
